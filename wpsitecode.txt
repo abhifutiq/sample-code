@@ -1,0 +1,409 @@
+<!-- Header-->
+<?php
+
+?><!DOCTYPE html>
+<html <?php language_attributes(); ?> class="no-js">
+<head>
+	<meta charset="<?php bloginfo( 'charset' ); ?>">
+	<meta name="viewport" content="width=device-width">
+	<link rel="profile" href="http://gmpg.org/xfn/11">
+	<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
+	<!--[if lt IE 9]>
+	<script src="<?php echo esc_url( get_template_directory_uri() ); ?>/js/html5.js"></script>
+	<![endif]-->
+	<?php wp_head(); ?>
+</head>
+
+<body <?php body_class(); ?>>
+<div id="page" class="hfeed site">
+	<a class="skip-link screen-reader-text" href="#content"><?php _e( 'Skip to content', 'themename' ); ?></a>
+
+	<div id="sidebar" class="sidebar">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="site-branding">
+				<?php
+					if ( is_front_page() && is_home() ) : ?>
+						<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
+					<?php else : ?>
+						<p class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></p>
+					<?php endif;
+
+					$description = get_bloginfo( 'description', 'display' );
+					if ( $description || is_customize_preview() ) : ?>
+						<p class="site-description"><?php echo $description; ?></p>
+					<?php endif;
+				?>
+				<button class="secondary-toggle"><?php _e( 'Menu and widgets', 'themename' ); ?></button>
+			</div><!-- .site-branding -->
+		</header><!-- .site-header -->
+
+		<?php get_sidebar(); ?>
+	</div><!-- .sidebar -->
+
+	<div id="content" class="site-content">
+	
+
+<!--Contect Page-->
+
+
+<?php
+
+?>
+
+<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+	<?php
+		// Post thumbnail.
+		themename_post_thumbnail();
+	?>
+
+	<header class="entry-header">
+		<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
+	</header><!-- .entry-header -->
+
+	<div class="entry-content">
+		<?php the_content(); ?>
+		<?php
+			wp_link_pages( array(
+				'before'      => '<div class="page-links"><span class="page-links-title">' . __( 'Pages:', 'themename' ) . '</span>',
+				'after'       => '</div>',
+				'link_before' => '<span>',
+				'link_after'  => '</span>',
+				'pagelink'    => '<span class="screen-reader-text">' . __( 'Page', 'themename' ) . ' </span>%',
+				'separator'   => '<span class="screen-reader-text">, </span>',
+			) );
+		?>
+	</div><!-- .entry-content -->
+
+	<?php edit_post_link( __( 'Edit', 'themename' ), '<footer class="entry-footer"><span class="edit-link">', '</span></footer><!-- .entry-footer -->' ); ?>
+
+</article><!-- #post-## -->
+
+
+<!--Page--> 
+
+
+<?php
+
+get_header(); ?>
+
+	<div id="primary" class="content-area">
+		<main id="main" class="site-main" role="main">
+
+		<?php
+		// Start the loop.
+		while ( have_posts() ) : the_post();
+
+			// Include the page content template.
+			get_template_part( 'content', 'page' );
+
+			// If comments are open or we have at least one comment, load up the comment template.
+			if ( comments_open() || get_comments_number() ) :
+				comments_template();
+			endif;
+
+		// End the loop.
+		endwhile;
+		?>
+
+		</main><!-- .site-main -->
+	</div><!-- .content-area -->
+
+<?php get_footer(); ?>
+
+
+<!--Index-->
+
+
+<?php
+
+get_header(); ?>
+
+	<div id="primary" class="content-area">
+		<main id="main" class="site-main" role="main">
+
+		<?php if ( have_posts() ) : ?>
+
+			<?php if ( is_home() && ! is_front_page() ) : ?>
+				<header>
+					<h1 class="page-title screen-reader-text"><?php single_post_title(); ?></h1>
+				</header>
+			<?php endif; ?>
+
+			<?php
+			// Start the loop.
+			while ( have_posts() ) : the_post();
+
+				get_template_part( 'content', get_post_format() );
+
+			// End the loop.
+			endwhile;
+
+			// Previous/next page navigation.
+			the_posts_pagination( array(
+				'prev_text'          => __( 'Previous page', 'themename' ),
+				'next_text'          => __( 'Next page', 'themename' ),
+				'before_page_number' => '<span class="meta-nav screen-reader-text">' . __( 'Page', 'themename' ) . ' </span>',
+			) );
+
+		// If no content, include the "No posts found" template.
+		else :
+			get_template_part( 'content', 'none' );
+
+		endif;
+		?>
+
+		</main><!-- .site-main -->
+	</div><!-- .content-area -->
+
+<?php get_footer(); ?>
+
+
+<!--Function-->
+
+
+<?php
+
+if ( ! isset( $content_width ) ) {
+	$content_width = 660;
+}
+
+/**
+ * Twenty Fifteen only works in WordPress 4.1 or later.
+ */
+if ( version_compare( $GLOBALS['wp_version'], '4.1-alpha', '<' ) ) {
+	require get_template_directory() . '/inc/back-compat.php';
+}
+
+if ( ! function_exists( 'themename_setup' ) ) :
+
+function themename_setup() {
+
+
+	load_theme_textdomain( 'themename', get_template_directory() . '/languages' );
+
+	// Add default posts and comments RSS feed links to head.
+	add_theme_support( 'automatic-feed-links' );
+
+	add_theme_support( 'title-tag' );
+
+	add_theme_support( 'post-thumbnails' );
+	set_post_thumbnail_size( 825, 510, true );
+
+	// This theme uses wp_nav_menu() in two locations.
+	register_nav_menus( array(
+		'primary' => __( 'Primary Menu',      'themename' ),
+		'social'  => __( 'Social Links Menu', 'themename' ),
+	) );
+
+	/*
+	 * Switch default core markup for search form, comment form, and comments
+	 * to output valid HTML5.
+	 */
+	add_theme_support( 'html5', array(
+		'search-form', 'comment-form', 'comment-list', 'gallery', 'caption'
+	) );
+
+
+	add_theme_support( 'post-formats', array(
+		'aside', 'image', 'video', 'quote', 'link', 'gallery', 'status', 'audio', 'chat'
+	) );
+
+	$color_scheme  = themename_get_color_scheme();
+	$default_color = trim( $color_scheme[0], '#' );
+
+	// Setup the WordPress core custom background feature.
+	add_theme_support( 'custom-background', apply_filters( 'themename_custom_background_args', array(
+		'default-color'      => $default_color,
+		'default-attachment' => 'fixed',
+	) ) );
+
+
+	add_editor_style( array( 'css/editor-style.css', 'genericons/genericons.css', themename_fonts_url() ) );
+}
+endif; // themename_setup
+add_action( 'after_setup_theme', 'themename_setup' );
+
+function themename_widgets_init() {
+	register_sidebar( array(
+		'name'          => __( 'Widget Area', 'themename' ),
+		'id'            => 'sidebar-1',
+		'description'   => __( 'Add widgets here to appear in your sidebar.', 'themename' ),
+		'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+		'after_widget'  => '</aside>',
+		'before_title'  => '<h2 class="widget-title">',
+		'after_title'   => '</h2>',
+	) );
+}
+add_action( 'widgets_init', 'themename_widgets_init' );
+
+if ( ! function_exists( 'themename_fonts_url' ) ) :
+
+function themename_fonts_url() {
+	$fonts_url = '';
+	$fonts     = array();
+	$subsets   = 'latin,latin-ext';
+
+	if ( 'off' !== _x( 'on', 'Noto Sans font: on or off', 'themename' ) ) {
+		$fonts[] = 'Noto Sans:400italic,700italic,400,700';
+	}
+
+	if ( 'off' !== _x( 'on', 'Noto Serif font: on or off', 'themename' ) ) {
+		$fonts[] = 'Noto Serif:400italic,700italic,400,700';
+	}
+
+	if ( 'off' !== _x( 'on', 'Inconsolata font: on or off', 'themename' ) ) {
+		$fonts[] = 'Inconsolata:400,700';
+	}
+
+
+	$subset = _x( 'no-subset', 'Add new subset (greek, cyrillic, devanagari, vietnamese)', 'themename' );
+
+	if ( 'cyrillic' == $subset ) {
+		$subsets .= ',cyrillic,cyrillic-ext';
+	} elseif ( 'greek' == $subset ) {
+		$subsets .= ',greek,greek-ext';
+	} elseif ( 'devanagari' == $subset ) {
+		$subsets .= ',devanagari';
+	} elseif ( 'vietnamese' == $subset ) {
+		$subsets .= ',vietnamese';
+	}
+
+	if ( $fonts ) {
+		$fonts_url = add_query_arg( array(
+			'family' => urlencode( implode( '|', $fonts ) ),
+			'subset' => urlencode( $subsets ),
+		), 'https://fonts.googleapis.com/css' );
+	}
+
+	return $fonts_url;
+}
+endif;
+
+function themename_javascript_detection() {
+	echo "<script>(function(html){html.className = html.className.replace(/\bno-js\b/,'js')})(document.documentElement);</script>\n";
+}
+add_action( 'wp_head', 'themename_javascript_detection', 0 );
+
+/**
+ * Enqueue scripts and styles.
+ *
+ * @since Twenty Fifteen 1.0
+ */
+function themename_scripts() {
+	// Add custom fonts, used in the main stylesheet.
+	wp_enqueue_style( 'themename-fonts', themename_fonts_url(), array(), null );
+
+	// Add Genericons, used in the main stylesheet.
+	wp_enqueue_style( 'genericons', get_template_directory_uri() . '/genericons/genericons.css', array(), '3.2' );
+
+	// Load our main stylesheet.
+	wp_enqueue_style( 'themename-style', get_stylesheet_uri() );
+
+	// Load the Internet Explorer specific stylesheet.
+	wp_enqueue_style( 'themename-ie', get_template_directory_uri() . '/css/ie.css', array( 'themename-style' ), '20141010' );
+	wp_style_add_data( 'themename-ie', 'conditional', 'lt IE 9' );
+
+	// Load the Internet Explorer 7 specific stylesheet.
+	wp_enqueue_style( 'themename-ie7', get_template_directory_uri() . '/css/ie7.css', array( 'themename-style' ), '20141010' );
+	wp_style_add_data( 'themename-ie7', 'conditional', 'lt IE 8' );
+
+	wp_enqueue_script( 'themename-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20141010', true );
+
+	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
+		wp_enqueue_script( 'comment-reply' );
+	}
+
+	if ( is_singular() && wp_attachment_is_image() ) {
+		wp_enqueue_script( 'themename-keyboard-image-navigation', get_template_directory_uri() . '/js/keyboard-image-navigation.js', array( 'jquery' ), '20141010' );
+	}
+
+	wp_enqueue_script( 'themename-script', get_template_directory_uri() . '/js/functions.js', array( 'jquery' ), '20150330', true );
+	wp_localize_script( 'themename-script', 'screenReaderText', array(
+		'expand'   => '<span class="screen-reader-text">' . __( 'expand child menu', 'themename' ) . '</span>',
+		'collapse' => '<span class="screen-reader-text">' . __( 'collapse child menu', 'themename' ) . '</span>',
+	) );
+}
+add_action( 'wp_enqueue_scripts', 'themename_scripts' );
+
+function themename_post_nav_background() {
+	if ( ! is_single() ) {
+		return;
+	}
+
+	$previous = ( is_attachment() ) ? get_post( get_post()->post_parent ) : get_adjacent_post( false, '', true );
+	$next     = get_adjacent_post( false, '', false );
+	$css      = '';
+
+	if ( is_attachment() && 'attachment' == $previous->post_type ) {
+		return;
+	}
+
+	if ( $previous &&  has_post_thumbnail( $previous->ID ) ) {
+		$prevthumb = wp_get_attachment_image_src( get_post_thumbnail_id( $previous->ID ), 'post-thumbnail' );
+		$css .= '
+			.post-navigation .nav-previous { background-image: url(' . esc_url( $prevthumb[0] ) . '); }
+			.post-navigation .nav-previous .post-title, .post-navigation .nav-previous a:hover .post-title, .post-navigation .nav-previous .meta-nav { color: #fff; }
+			.post-navigation .nav-previous a:before { background-color: rgba(0, 0, 0, 0.4); }
+		';
+	}
+
+	if ( $next && has_post_thumbnail( $next->ID ) ) {
+		$nextthumb = wp_get_attachment_image_src( get_post_thumbnail_id( $next->ID ), 'post-thumbnail' );
+		$css .= '
+			.post-navigation .nav-next { background-image: url(' . esc_url( $nextthumb[0] ) . '); border-top: 0; }
+			.post-navigation .nav-next .post-title, .post-navigation .nav-next a:hover .post-title, .post-navigation .nav-next .meta-nav { color: #fff; }
+			.post-navigation .nav-next a:before { background-color: rgba(0, 0, 0, 0.4); }
+		';
+	}
+
+	wp_add_inline_style( 'themename-style', $css );
+}
+add_action( 'wp_enqueue_scripts', 'themename_post_nav_background' );
+
+function themename_nav_description( $item_output, $item, $depth, $args ) {
+	if ( 'primary' == $args->theme_location && $item->description ) {
+		$item_output = str_replace( $args->link_after . '</a>', '<div class="menu-item-description">' . $item->description . '</div>' . $args->link_after . '</a>', $item_output );
+	}
+
+	return $item_output;
+}
+add_filter( 'walker_nav_menu_start_el', 'themename_nav_description', 10, 4 );
+
+
+function themename_search_form_modify( $html ) {
+	return str_replace( 'class="search-submit"', 'class="search-submit screen-reader-text"', $html );
+}
+add_filter( 'get_search_form', 'themename_search_form_modify' );
+
+require get_template_directory() . '/inc/custom-header.php';
+
+require get_template_directory() . '/inc/template-tags.php';
+
+require get_template_directory() . '/inc/customizer.php';
+
+
+<!--Footer--> 
+
+
+<?php
+
+?>
+
+	</div><!-- .site-content -->
+
+	<footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="site-info">
+			<?php
+				
+				do_action( 'themename_credits' );
+			?>
+			<a href="<?php echo esc_url( __( 'https://wordpress.org/', 'themename' ) ); ?>"><?php printf( __( 'Proudly powered by %s', 'themename' ), 'WordPress' ); ?></a>
+		</div><!-- .site-info -->
+	</footer><!-- .site-footer -->
+
+</div><!-- .site -->
+
+<?php wp_footer(); ?>
+
+</body>
+</html>
